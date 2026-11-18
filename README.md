@@ -111,7 +111,7 @@ python3 app.py adduser USERNAME PASSWORD
 Copy the code and add the key:
 ```bash
 cd ~
-git clone https://github.com/Olga-Igabe/bookshelf.git
+git clone https://github.com/Tharcisse-Irasubiza/bookshelf.git
 cd bookshelf
 vi .env    # add the GOOGLE_BOOKS_API_KEY line
 ```
