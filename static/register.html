@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create account - Bookshelf</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-page">
+    <aside class="auth-side">
+        <div class="brand"><span class="logo">B</span> Bookshelf</div>
+        <h2>Your reading list,<br>always with you.</h2>
+        <p>Create a free account to save books and see your reading dashboard</p>
+    </aside>
+
+    <main class="auth-main">
+        <form id="auth-form" class="auth-card" data-action="register">
+            <h1>Create account</h1>
+            <p class="muted">It takes less than a minute.</p>
+            <label>Username
+                <input id="username" autocomplete="username" required>
+                <small>3-30 letters, numbers or underscores</small>
+            </label>
+            <label>Password
+                <input id="password" type="password" autocomplete="new-password" minlength="8" required>
+                <small>At least 8 characters</small>
+            </label>
+            <label>Confirmed password
+                <input id="confirm" type="password" autocomplete="new-password" required>
+            </label>
+           <button type="submit">Create account</button>
+           <p id="message"></p>
+           <p class="muted">Already have an account? <a href="/">Log in</a> </p>
+        </form>
+        <p class="served">Served by <span id="server">-</span></p>
+    </main>
+
+    <script src="auth.js"></script>
+</body>
+</html>
