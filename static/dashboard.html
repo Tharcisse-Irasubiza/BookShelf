@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Bookshelf</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand"><span class="logo">B</span> Bookshelf</div>
+        <div class="user">
+            Hi, <strong id="who"></strong>
+            <button id="logout-btn" class="ghost">Log out</button>
+        </div>
+    </header>
+
+    <main class="dashboard">
+        <h1>Your reading dashboard</h1>
+
+        <section class="stats">
+            <div class="stat"><span id="stat-saved">0</span><small>Books saved</small></div>
+            <div class="stat"><span id="stat-pages">0</span><small>Pages to read</small></div>
+            <div class="stat"><span id="stat-rating">0</span><small>Average rating</small></div>
+            <div class="stat"><span id="stat-categories">0</span><small>Categories</small></div>
+        </section>
+
+        <section class="panel">
+            <h2>Your library by category</h2>
+            <div id="chart"></div>
+        </section>
+
+        <section class="panel">
+            <div class="tabs">
+                <button id="tab-search" class="active">Find books</button>
+                <button id="tab-library">My Library (<span id="count">0</span>)</button>
+            </div>
+
+            <form id="search-form" class="row">
+                <input id="query" placeholder="Tittle, author or topic, eg python programming">
+                <button type="submit">Search</button>
+            </form>
+
+            <div class="row">
+                <select id="category">
+                    <option value="">All categories</option>
+                </select>
+                <select id="sort">
+                    <option value="relevance">Sort: Relevance</option>
+                    <option value="title">Sort: Title A-Z</option>
+                    <option value="newest">Sort: Newest first</option>
+                    <option value="oldest">Sort: Oldest first</option>
+                    <option value="rating">Sort: Highest rated</option>
+                </select>
+            </div>
+
+            <p id="message"></p>
+            <div id="books"></div>
+        </section>
+    </main>
+    
+    <footer>
+        Book data by <a href="https://developers.google.com/books">Google Books API</a>
+        &middot; Served by <span id="server">-</span>
+    </footer>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
