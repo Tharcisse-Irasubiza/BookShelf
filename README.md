@@ -75,19 +75,44 @@ bookshelf/
 └── README.md
 ```
 
+## About the API (Google Books API)
+
+I chose the Google Books API because it is an official API run by Google,
+it is free, it covers millions of books, and it is served only over HTTPS.
+Before building, I read the official documentation:
+[Using the API](https://developers.google.com/books/docs/v1/using) and
+[Volumes: list](https://developers.google.com/books/docs/v1/reference/volumes/list).
+
+| Detail | What the documentation says | How Bookshelf uses it |
+|---|---|---|
+| Endpoint | `GET https://www.googleapis.com/books/v1/volumes?q={search terms}` | Called only by `app.py`, never by the browser |
+| Required parameter | `q`: the search text | The user's search, limited to 100 characters |
+| Results per request | `maxResults`: 0 to 40 | Asks for 40, the maximum |
+| Pagination | `startIndex`: position of the first result (starts at 0) | Not used; the first 40 results are shown |
+| Authentication | An API key for public data, or OAuth 2.0 for a user's own Google library | API key only, because book search is public data |
+| Sending the key | The `key` query parameter | Added on the server from `.env`, so it never reaches the browser |
+| Rate limit | Daily quota per project, shown in Google Cloud Console under the API's Quotas tab (the default is commonly 1,000 requests per day) | Results are cached for 10 minutes, so repeated searches do not use the quota |
+| Quota exceeded | HTTP `429` | Shows "Too many searches right now. Please wait a minute." |
+| Bad or missing key | HTTP `400` or `403` | Shows "The book service rejected the request." |
+| Missing fields | Many books have no cover, rating, category or year | The server fills in safe defaults |
+
 ## Get a Google Books API Key
 
 1. Go to https://console.cloud.google.com and sign in with a Google account.
 2. Create a new project.
 3. Open "APIs & Services" > "Library", search "Books API" and click Enable.
 4. Open "APIs & Services" > "Credentials" > "Create credentials" > "API key".
-5. Copy the key.
+5. Click the new key, choose "Restrict key", and under "API restrictions"
+   select only "Books API". If the key ever leaks, it cannot be used for
+   other Google services.
+6. Copy the key into `.env` (see below). Check the daily limit under
+   "APIs & Services" > "Books API" > "Quotas".
 
 ## Run Locally
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/Olga-Igabe/bookshelf.git
+   git clone https://github.com/Tharcisse-Irasubiza/bookshelf.git
    cd bookshelf
    ```
 2. Create a file named `.env` in the project folder containing one line:
@@ -111,7 +136,7 @@ python3 app.py adduser USERNAME PASSWORD
 Copy the code and add the key:
 ```bash
 cd ~
-git clone https://github.com/Tharcisse-Irasubiza/bookshelf.git
+git clone https://github.com/Olga-Igabe/bookshelf.git
 cd bookshelf
 vi .env    # add the GOOGLE_BOOKS_API_KEY line
 ```
