@@ -167,5 +167,91 @@ function render() {
         const card = document.createElement("div");
         card.className = "book";
         
-    })
+        const cover = document.createElement("div");
+        cover.className = "cover";
+        if (book.cover) cover.style.backgroundImage = "url(" + JSON.stringify(book.cover) + ")";
+        card.appendChild(cover);
+
+        const details = document.createElement("div");
+        addText(details, "h3", book.title);
+        addText(details, "p", book.authors);
+        addText(details, "p", (book.year || "Year unknown") + " . " + book.category);
+        addText(details, "p", (book.rating ? "★ " + book.rating + " / 5" : "No rating") + 
+            (book.pages ? " . " + book.pages + " pages" : ""));
+        
+        const actions = document.createElement("div");
+        actions.className = "actions";
+        const button = document.createElement("button");
+        button.textContent = isSaved(book) ? "Remove" : "Save";
+        button.className = isSaved(book) ? "ghost" : "";
+        button.addEventListener("click", () => toggleSave(book));
+        actions.appendChild(button);
+
+        if (book.link && book.link.startsWith("https://")) {
+            const link = document.createElement("a");
+            link.href = book.link;
+            link.target = "_blank";
+            link.rel = "noopener";
+            link.textContent = "More info";
+            actions.appendChild(link);
+        }
+
+        details.appendChild(actions);
+        card.appendChild(details);
+        box.appendChild(card);
+    });
+
+    if (el("message").className === "error") return;
+    if (view === "library" && library.length === 0) {
+        showMessage("Your library is empty. Find books and save them here.");
+    }  else if (books.length === 0 && results.length > 0) {
+        showMessage("No books in this category.");
+    }  else if (books.length > 0) {
+        showMessage("Showing " + books.length + " books.");
+    }  else if (view === "search") {
+        showMessage("No books found. Try another search.");
+    }
 }
+
+function switchView(name) {
+    view = name;
+    el("tab-search").classList.toggle("active", name === "search");
+    el("tab-library").classList.toggle("active", name === "library");
+    el("search-form").style.display = name === "search" ? "flex" : "none";
+    showMessage("");
+    fillCategories();
+    render();
+}
+
+// start
+async function start() {
+    try {
+        el("who").textContent = (await api("/api/me")).username;
+        library = (await api("/api/library")).books;
+    }   catch (err) {
+        showMessage(err.message, true);
+        return;
+    }
+    updateStats();
+    el("query").value = "software engineering";
+    searchBooks();
+}
+
+el("logout-btn").addEventListener("click", async () => {
+    try {
+        await sendJson("/api/logout", {});
+    }   catch (err) {
+        // go to login page if server can't be reached
+    }
+    location.href = "/";
+});
+el("search-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    searchBooks();
+});
+el("category").addEventListener("change", render);
+el("sort").addEventListener("change", render);
+el("tab-search").addEventListener("click", () => switchView("search"));
+el("tab-library").addEventListener("click", () => switchView("library"));
+
+start();
