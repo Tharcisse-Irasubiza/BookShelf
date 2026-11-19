@@ -105,7 +105,7 @@ def new_session(user_id):
     return token
 
 def user_from_token(token):
-    rows = query("SELECT users.id. users.username FROM sessions "
+    rows = query("SELECT users.id, users.username FROM sessions "
                  "JOIN users ON users.id = sessions.user_id "
                  "WHERE sessions.token = ? AND sessions.created > ?",
                  (token, time.time() - SESSION_SECONDS))
