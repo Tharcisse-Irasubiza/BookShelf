@@ -211,7 +211,7 @@ class Handler(SimpleHTTPRequestHandler):
         user = self.current_user()
         if user is None:
             self.send_json(401,{"error": "Please login first."})
-        elif path == "api/me":
+        elif path == "/api/me":
             self.send_json(200, {"username": user["username"]})
         elif path == "/api/library":
             rows = query("SELECT book FROM library WHERE user_id = ?",
