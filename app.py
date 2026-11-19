@@ -240,7 +240,7 @@ class Handler(SimpleHTTPRequestHandler):
                   (self.session_token(),))
             self.send_json(200, {"message": "Logged out. "},
                            self.login_cookie("", 0))
-        elif path == "api/library":
+        elif path == "/api/library":
             self.handle_save(data)
         else:
             self.send_json(404, {"error": "Not found."})
