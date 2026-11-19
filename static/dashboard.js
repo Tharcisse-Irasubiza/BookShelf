@@ -128,7 +128,7 @@ function isSaved(book) {
 async function toggleSave(book) {
     try {
         if (isSaved(book)) {
-            await api("/api/library?id=" + encodeURIComponet(book.id), { method: "DELETE" });
+            await api("/api/library?id=" + encodeURIComponent(book.id), { method: "DELETE" });
             library = library.filter((b) => b.id !== book.id);
         }   else {
             await sendJson("/api/library", book);
