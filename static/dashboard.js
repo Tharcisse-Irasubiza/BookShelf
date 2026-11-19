@@ -54,7 +54,7 @@ function updateStats() {
 
     el("count").textContent = library.length;
     el("stat-saved").textContent = library.length;
-    el("stat-pages").textContent = pages.toLocalString();
+    el("stat-pages").textContent = pages.toLocaleString();
     el("stat-rating").textContent = rated.length
       ? (rated.reduce((sum, b) => sum + b.rating, 0) / rated.length).toFixed(1) + " / 5"
       : "-";
