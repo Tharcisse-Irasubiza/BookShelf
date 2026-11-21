@@ -22,7 +22,7 @@ API_URL = "https://www.googleapis.com/books/v1/volumes"
 CACHE_SECONDS = 600
 SESSION_SECONDS = 7 * 24 * 60 * 60
 HOSTNAME = socket.gethostname()
-USERNAME_RULE = re.compile(r"^[A-Za-z0-9]{3,30}$")
+USERNAME_RULE = re.compile(r"^[A-Za-z0-9_]{3,30}$")
 BOOK_FIELDS = ("id", "title", "authors", "year", "category",
                "rating","pages","cover","link")
 cache = {}

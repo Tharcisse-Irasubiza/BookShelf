@@ -3,7 +3,7 @@ const form = document.getElementById("auth-form");
 const message = document.getElementById("message");
 
 function show(text, isError) {
-    message.textcontent = text;
+    message.textContent = text;
     message.className = isError ? "error" : "muted";
 }
 
