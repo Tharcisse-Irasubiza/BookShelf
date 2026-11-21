@@ -1,5 +1,15 @@
 # Bookshelf - Find and Save Books
 
+**Live site:** http://3.9.180.134
+
+| Server | Name | IP |
+|---|---|---|
+| Web server 1 | 7296-web-01 | 18.130.100.127 |
+| Web server 2 | 7296-web-02 | 3.10.142.222 |
+| Load balancer | 7296-lb-01 | 3.9.180.134 |
+
+**Demo login:** username `demo_user`, password `Demo12345` (or create your own account).
+
 Bookshelf is a web app that helps students and readers find books on any
 title, author or topic, compare them by year, category, rating and length,
 and keep a personal reading list. Instead of searching many websites, a
@@ -112,8 +122,8 @@ Before building, I read the official documentation:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/Tharcisse-Irasubiza/bookshelf.git
-   cd bookshelf
+   git clone https://github.com/Tharcisse-Irasubiza/BookShelf.git
+   cd BookShelf
    ```
 2. Create a file named `.env` in the project folder containing one line:
    `GOOGLE_BOOKS_API_KEY=` followed directly by your key.
@@ -136,8 +146,8 @@ python3 app.py adduser USERNAME PASSWORD
 Copy the code and add the key:
 ```bash
 cd ~
-git clone https://github.com/Tharcisse-Irasubiza/bookshelf.git
-cd bookshelf
+git clone https://github.com/Tharcisse-Irasubiza/BookShelf.git
+cd BookShelf
 vi .env    # add the GOOGLE_BOOKS_API_KEY line
 ```
 
@@ -150,8 +160,8 @@ After=network.target
 
 [Service]
 User=ubuntu
-WorkingDirectory=/home/ubuntu/bookshelf
-ExecStart=/usr/bin/python3 /home/ubuntu/bookshelf/app.py
+WorkingDirectory=/home/ubuntu/BookShelf
+ExecStart=/usr/bin/python3 /home/ubuntu/BookShelf/app.py
 Restart=always
 
 [Install]
@@ -167,7 +177,7 @@ is running.
 
 Create the same demo account on this server (the grader's login):
 ```bash
-cd ~/bookshelf
+cd ~/BookShelf
 python3 app.py adduser demo_user Demo12345
 ```
 
@@ -201,8 +211,8 @@ frontend bookshelf_front
 backend bookshelf_back
     balance roundrobin
     cookie SERVERID insert indirect nocache
-    server web01 <web-01 IP>:80 check cookie web01
-    server web02 <web-02 IP>:80 check cookie web02
+    server web01 18.130.100.127:80 check cookie web01
+    server web02 3.10.142.222:80 check cookie web02
 ```
 ```bash
 sudo haproxy -c -f /etc/haproxy/haproxy.cfg
@@ -219,7 +229,7 @@ sudo systemctl restart haproxy
 ### 3. Testing the Load Balancer
 
 ```bash
-for i in 1 2 3 4; do curl -sI http://<lb-01 IP> | grep X-Served-By; done
+for i in 1 2 3 4; do curl -sI http://3.9.180.134 | grep X-Served-By; done
 ```
 `curl` sends no cookie, so the `X-Served-By` header alternates between the
 two web servers. In a browser, the footer ("Served by ...") stays on one
