@@ -1,6 +1,6 @@
 # Bookshelf - Find and Save Books
 
-**Live site:** http://3.9.180.134
+**Live site:** https://tharcisse-irasubiza.tech (load balancer IP: http://3.9.180.134)
 
 | Server | Name | IP |
 |---|---|---|
@@ -38,11 +38,12 @@ rated books first, and save the ones they want to read later.
 - Database: SQLite (built into Python)
 - Frontend: HTML, CSS, JavaScript
 - Servers: Nginx (reverse proxy) on Web01 and Web02, HAProxy on Lb01
+- HTTPS: free Let's Encrypt certificate on Lb01
 
 ## How It Works
 
 ```
-Browser -> Lb01 (HAProxy :80) -> Web01 or Web02 (Nginx :80) -> app.py (:5000) -> Google Books API
+Browser -> Lb01 (HAProxy :443 HTTPS / :80) -> Web01 or Web02 (Nginx :80) -> app.py (:5000) -> Google Books API
 ```
 
 The browser calls `/api/books?q=python` on our own server. `app.py` checks
@@ -172,10 +173,11 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now bookshelf
 curl -s http://127.0.0.1:5000/api/me
 ```
-The last command should answer `Please log in first.`, which shows the app
+The last command should answer `Please login first.`, which shows the app
 is running.
 
-Create the same demo account on this server (the grader's login):
+Create the same demo account on this server (the grader's login). Run it
+without `sudo`, so the database file belongs to the `ubuntu` user:
 ```bash
 cd ~/BookShelf
 python3 app.py adduser demo_user Demo12345
@@ -226,10 +228,40 @@ sudo systemctl restart haproxy
   has its own SQLite file: a user who logged in on Web01 is only known to
   Web01.
 
-### 3. Testing the Load Balancer
+### 3. Domain and HTTPS
+
+The domain `tharcisse-irasubiza.tech` has two DNS A records (`@` and `www`)
+pointing to Lb01 (`3.9.180.134`). Because the app has a login, I added HTTPS
+so usernames and passwords are encrypted. On Lb01, a free Let's Encrypt
+certificate was created with Certbot:
+```bash
+sudo apt install -y certbot
+sudo systemctl stop haproxy
+sudo certbot certonly --standalone -d tharcisse-irasubiza.tech -d www.tharcisse-irasubiza.tech
+sudo mkdir -p /etc/haproxy/certs
+sudo bash -c 'cat /etc/letsencrypt/live/tharcisse-irasubiza.tech/fullchain.pem /etc/letsencrypt/live/tharcisse-irasubiza.tech/privkey.pem > /etc/haproxy/certs/tharcisse-irasubiza.tech.pem'
+sudo chmod 600 /etc/haproxy/certs/tharcisse-irasubiza.tech.pem
+```
+The frontend then listens on port 443 and sends domain visitors from HTTP to
+HTTPS:
+```
+frontend bookshelf_front
+    bind *:80
+    bind *:443 ssl crt /etc/haproxy/certs/tharcisse-irasubiza.tech.pem
+    http-request redirect scheme https code 301 if !{ ssl_fc } { hdr(host) -i tharcisse-irasubiza.tech www.tharcisse-irasubiza.tech }
+    default_backend bookshelf_back
+```
+```bash
+sudo haproxy -c -f /etc/haproxy/haproxy.cfg
+sudo systemctl start haproxy
+```
+The redirect only applies to the domain, because the certificate is for the
+domain and not for the IP address.
+
+### 4. Testing the Load Balancer
 
 ```bash
-for i in 1 2 3 4; do curl -sI http://3.9.180.134 | grep X-Served-By; done
+for i in 1 2 3 4; do curl -sI http://3.9.180.134 | grep -i served; done
 ```
 `curl` sends no cookie, so the `X-Served-By` header alternates between the
 two web servers. In a browser, the footer ("Served by ...") stays on one
@@ -243,7 +275,7 @@ other one.
 | Situation | What the user sees |
 |---|---|
 | Empty username or password | "Please enter a username and password." |
-| Username or password breaks the rules | "Username must be 3-30 letters..." / "Password must be at least 8 characters." |
+| Username or password breaks the rules | "username must be 3-30 letters, numbers or underscores" / "Password must be at least 8 characters." |
 | Username already exists | "That username is already taken." |
 | Wrong login | "Wrong username or password." |
 | Passwords do not match (create account) | "Passwords do not match." |
@@ -260,6 +292,8 @@ other one.
 
 ## Security
 
+- The site uses HTTPS (Let's Encrypt), so logins are encrypted between the
+  browser and the load balancer.
 - The API key is stored in `.env` on each server and ignored by Git.
 - Only the `static/` folder is served, so `.env` and `app.py` cannot be
   downloaded from the browser.
@@ -290,13 +324,28 @@ other one.
   sticky sessions so each browser stays on one server, and created the demo
   account on both servers. A larger app would use one shared database
   server such as PostgreSQL.
+- **Losing my SSH key:** my servers were set up with a key I had created in
+  the intranet sandbox. When the sandbox was reset, the private key was gone
+  and every server answered "Permission denied (publickey)". I created a new
+  key on my computer, added it to my intranet profile, got new servers, and
+  now keep a backup of my private key.
+- **Finding small typos:** I typed the code myself, and small mistakes broke
+  features: a full stop instead of a comma in an SQL query, a missing `_` in
+  the username rule (which also stopped the demo account from being
+  created), and `textcontent` instead of `textContent` (so error messages
+  never appeared). I found them by reading the browser console and Network
+  tab, the server terminal output and `journalctl` on the servers.
+- **Git push rejected:** after editing a file on GitHub, my push was
+  rejected. I used `git pull --rebase` to bring in the change, then pushed.
+- **HTTPS:** the browser showed "Not secure" because the site used plain
+  HTTP. I added a Let's Encrypt certificate on the load balancer.
 
 ## Bonus Tasks Completed
 
 - User authentication with SQLite and a personal library per user
 - Data visualization: dashboard stats and a category bar chart
 - Caching of API responses (10 minutes)
-- Security: password hashing, input validation, SQL injection and XSS protection
+- Security: HTTPS, password hashing, input validation, SQL injection and XSS protection
 
 ## Credits
 
@@ -306,3 +355,4 @@ other one.
 - [Python sqlite3](https://docs.python.org/3/library/sqlite3.html) and
   [hashlib](https://docs.python.org/3/library/hashlib.html) documentation
 - [HAProxy](https://www.haproxy.org/) and [Nginx](https://nginx.org/) documentation
+- [Let's Encrypt](https://letsencrypt.org/) and [Certbot](https://certbot.eff.org/) - free HTTPS certificate
