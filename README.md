@@ -1,6 +1,6 @@
 # Bookshelf - Find and Save Books
 
-**Live site:** https://tharcisse-irasubiza.tech (load balancer IP: http://3.9.180.134)
+**Live site:** https://tharcisse-irasubiza.tech (load balancer IP: http://3.9.180.134).
 **Demo Link:** https://youtu.be/FKpMJ1UvMNg
 
 | Server | Name | IP |
