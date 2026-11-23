@@ -1,6 +1,7 @@
 # Bookshelf - Find and Save Books
 
-**Live site:** https://tharcisse-irasubiza.tech (load balancer IP: http://3.9.180.134).  
+**Live site:** https://tharcisse-irasubiza.tech (load balancer IP: http://3.9.180.134).   
+**Demo login:** username `demo_user`, password `Demo12345` (or create your own account).  
 **Demo Link:** https://youtu.be/FKpMJ1UvMNg
 
 | Server | Name | IP |
@@ -9,7 +10,6 @@
 | Web server 2 | 7296-web-02 | 3.10.142.222 |
 | Load balancer | 7296-lb-01 | 3.9.180.134 |
 
-**Demo login:** username `demo_user`, password `Demo12345` (or create your own account).
 
 Bookshelf is a web app that helps students and readers find books on any
 title, author or topic, compare them by year, category, rating and length,
